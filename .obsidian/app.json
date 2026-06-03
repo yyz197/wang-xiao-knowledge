@@ -1,0 +1,15 @@
+{
+  "newFileLocation": "current",
+  "newFileFolderPath": "/",
+  "attachmentFolderPath": "attachments",
+  "showLineNumber": false,
+  "spellcheck": false,
+  "readableLineLength": true,
+  "strictLineBreaks": false,
+  "showFrontmatter": true,
+  "foldHeading": true,
+  "foldIndent": true,
+  "defaultViewMode": "source",
+  "livePreview": true,
+  "showInlineTitle": true
+}
