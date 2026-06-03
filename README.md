@@ -59,7 +59,7 @@ related:
 2. 克隆仓库到本地
 
 ```bash
-git clone https://github.com/Shicongcoding/wang-xiao-knowledge.git
+git clone https://github.com/yyz197/wang-xiao-knowledge.git
 ```
 
 3. 打开 Obsidian → 打开文件夹 → 选 `wang-xiao-knowledge`
@@ -134,7 +134,7 @@ Their content intersects on topics like Africa, Cold War history, resource polit
 ### Quick start
 
 ```bash
-git clone https://github.com/Shicongcoding/wang-xiao-knowledge.git
+git clone https://github.com/yyz197/wang-xiao-knowledge.git
 ```
 
 Open the folder as an Obsidian vault. Recommended plugins: **Dataview** for metadata queries.
