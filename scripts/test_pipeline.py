@@ -262,44 +262,32 @@ def create_mock_data():
 
 
 def test_generate_notes():
-    print("\n--- Testing generate_notes (mock mode) ---")
+    print("\n--- Testing generate_notes (full + skeleton mode) ---")
 
-    # Monkey-patch DeepSeek call to return mock analysis
-    original_call = generate_notes.call_deepseek
-
-    mock_analyses = {}
-    for v, a in zip(MOCK_VIDEOS_XIAOYUEHAN["videos"], MOCK_ANALYSIS_XIAOYUEHAN):
-        mock_analyses[v["bvid"]] = a
-    for v, a in zip(MOCK_VIDEOS_WANGXIAO["videos"], MOCK_ANALYSIS_WANGXIAO):
-        mock_analyses[v["bvid"]] = a
-
-    generate_notes.call_deepseek = lambda client, title, desc, tags, text: mock_analyses.get(
-        "BV" + "".join(c for c in text if c.isalnum())[:10] if not any(k in title for k in mock_analyses) else next(
-            (v["bvid"] for v in MOCK_VIDEOS_XIAOYUEHAN["videos"] + MOCK_VIDEOS_WANGXIAO["videos"] if v["title"] == title),
-            "BV1Uy4y1S7Eq"
-        ),
-        mock_analyses.get("BV1Uy4y1S7Eq", {"title": title, "summary": "mock"})
-    )
-
-    # Better approach: just process with mock directly
-    generate_notes.call_deepseek = original_call
-
-    # Instead, directly generate notes from mock analysis
     for up_name, vids, analyses in [
         ("小约翰可汗", MOCK_VIDEOS_XIAOYUEHAN["videos"], MOCK_ANALYSIS_XIAOYUEHAN),
         ("王骁Albert", MOCK_VIDEOS_WANGXIAO["videos"], MOCK_ANALYSIS_WANGXIAO),
     ]:
         for v, analysis in zip(vids, analyses):
             series = generate_notes.classify_series(v, up_name)
-            note = generate_notes.build_note(v, series, analysis)
             out_dir = os.path.join(PROJECT_DIR, series)
             os.makedirs(out_dir, exist_ok=True)
             out_path = os.path.join(out_dir, f"{v['bvid']}.md")
+
+            # Alternate: full note vs skeleton
+            idx = vids.index(v)
+            if idx % 2 == 0:
+                note = generate_notes.build_note(v, series, analysis)
+                note_type = "full"
+            else:
+                note = generate_notes.build_skeleton_note(v, series)
+                note_type = "skeleton"
+
             with open(out_path, "w", encoding="utf-8") as f:
                 f.write(note)
-            print(f"  Generated: {series}/{v['bvid']}.md -> {analysis['title']}")
+            print(f"  [{note_type}] {series}/{v['bvid']}.md -> {analysis['title']}")
 
-    print(f"  Done! Series dirs populated.")
+    print(f"  Done! Mixed full + skeleton notes created.")
 
 
 def test_build_mocs():

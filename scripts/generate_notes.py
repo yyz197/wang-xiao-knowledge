@@ -209,6 +209,41 @@ def build_note(video: dict, series: str, analysis: dict) -> str:
     return "\n".join(parts)
 
 
+def build_skeleton_note(video: dict, series: str) -> str:
+    title = video.get("title", "未命名")
+    desc = video.get("description", "")
+    tags = video.get("tags", [])
+    source = "[[小约翰可汗]]" if series.startswith("01") or series.startswith("02") or series.startswith("03") else "[[王骁Albert]]"
+    created = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(video.get("pubdate", time.time())))
+
+    parts = ["---"]
+    parts.append(f'title: "{title}"')
+    parts.append(f"created: {created}")
+    parts.append(f"category: 原始素材")
+    parts.append(f'source: "{source}"')
+    parts.append(f'series: "{series}"')
+    parts.append(f"bv: {video['bvid']}")
+    if tags:
+        parts.append("tags:")
+        for t in tags[:10]:
+            parts.append(f"  - {t}")
+    parts.append("---")
+    parts.append("")
+    parts.append(f"# {title}")
+    parts.append("")
+    parts.append(f"> 原视频：[BV{video['bvid']}](https://www.bilibili.com/video/{video['bvid']})")
+    if desc:
+        parts.append("")
+        parts.append("## 简介")
+        parts.append("")
+        parts.append(desc)
+    parts.append("")
+    parts.append("---")
+    parts.append("")
+    parts.append("> ⚠️ 本文为骨架笔记，正文待补充。")
+    return "\n".join(parts)
+
+
 def process_videos(up_name: str, videos_json: str, limit: int | None = None):
     with open(videos_json, "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -248,7 +283,12 @@ def process_videos(up_name: str, videos_json: str, limit: int | None = None):
 
         sub_path = os.path.join(subs_dir, f"{bvid}.txt")
         if not os.path.exists(sub_path) or os.path.getsize(sub_path) < 50:
+            note = build_skeleton_note(v, series)
+            with open(out_path, "w", encoding="utf-8") as f:
+                f.write(note)
             no_sub += 1
+            if (i + 1) % 20 == 0:
+                print(f"  [{up_name}] {i+1}/{total} ({success} full, {no_sub} skeleton)")
             continue
 
         with open(sub_path, "r", encoding="utf-8") as f:
